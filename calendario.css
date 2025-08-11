@@ -1,0 +1,292 @@
+@charset "utf-8";
+
+/* =========================
+   Barber Studio - CSS completo
+   Pegar entero en tu archivo .css
+   Ajusta --header-height si tu header cambia
+   ========================= */
+
+:root {
+  --header-height: 150px;
+  --accent: #ffb74d;
+  --max-width: 1200px;
+}
+
+/* Reset / base */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #393939;
+  color: #eee;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER (barra superior) */
+.barra-superior {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--header-height);
+  background-color: #000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 1000;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.logo img {
+  height: calc(var(--header-height) - 10px);
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Redes sociales */
+.redes {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.redes a {
+  color: #fff;
+  font-size: 20px;
+  text-decoration: none;
+  transition: color .25s;
+}
+.redes a:hover { color: #00e676; }
+
+/* CONTENEDOR PRINCIPAL */
+.contenedor {
+  flex: 1 0 auto;
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 20px auto;
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  background: #1e1e1e;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgb(0 0 0 / 0.6);
+  align-items: flex-start;
+  justify-content: center;
+  flex-wrap: nowrap;
+}
+
+/* Calendario */
+.calendario {
+  flex: 0 1 420px;
+  max-width: 420px;
+  background: #2c2c2c;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+  color: #eee;
+}
+
+/* Formulario */
+.formulario {
+  flex: 1 1 520px;
+  max-width: 600px;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 30px 25px;
+  background-color: rgba(0,0,0,0.6);
+  box-shadow: 0 8px 18px rgb(0 0 0 / 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  z-index: 1;
+}
+
+/* TABLA CALENDARIO */
+#tabla-calendario {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 15px;
+  table-layout: fixed;
+  border: 1px solid black;
+}
+#tabla-calendario thead th {
+  background-color: transparent;
+  color: #ddd;
+  padding: 8px 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-align: center;
+  border-bottom: 1px solid black;
+  border-right: 1px solid black;
+}
+#tabla-calendario thead th:last-child { border-right: none; }
+#tabla-calendario tbody td {
+  height: 40px;
+  text-align: center;
+  cursor: pointer;
+  border: 1px solid black;
+  border-radius: 6px;
+  transition: background-color 0.25s, color 0.25s;
+  user-select: none;
+  background-color: rgba(255 255 255 / 0.05);
+  color: #eee;
+}
+#tabla-calendario tbody td:hover:not(:empty):not(.seleccionado) {
+  background-color: rgba(255 255 255 / 0.15);
+}
+#tabla-calendario tbody td.seleccionado {
+  background-color: #444;
+  color: white;
+  font-weight: 700;
+}
+
+/* Horas */
+.horas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 8px;
+}
+.hora {
+  background-color: #555;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  min-width: 60px;
+  text-align: center;
+  font-weight: 600;
+  transition: background-color 0.3s;
+  border: 1px solid black;
+}
+.hora:hover:not(.reservada):not(.seleccionada) { background-color: #222; }
+.hora.reservada { background-color: #333; color: #999; cursor: not-allowed; text-decoration: line-through; border-color: #111; }
+.hora.seleccionada { background-color: black; font-weight: 700; }
+
+/* FORMULARIO */
+.formulario .imagen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.formulario .imagen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.3);
+  user-select: none;
+}
+.formulario h2 {
+  text-align: center;
+  color: var(--accent);
+  font-weight: 700;
+  z-index: 2;
+  position: relative;
+}
+.formulario form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  z-index: 2;
+  position: relative;
+}
+.formulario input[type="text"],
+.formulario input[type="tel"],
+.formulario input[readonly],
+.formulario select {
+  padding: 12px 14px;
+  font-size: 1rem;
+  border: 1.5px solid black;
+  border-radius: 8px;
+  background-color: rgba(255 255 255 / 0.08);
+  color: #eee;
+  transition: border-color 0.3s, background-color 0.3s;
+  width: 100%;
+}
+.formulario input:focus,
+.formulario select:focus {
+  border-color: var(--accent);
+  background-color: rgba(255 255 255 / 0.12);
+  outline: none;
+}
+.formulario button {
+  background-color: var(--accent);
+  color: black;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.formulario button:hover { background-color: #ffca28; }
+
+/* FOOTER */
+footer {
+  background-color: #000;
+  color: #aaa;
+  text-align: center;
+  padding: 15px 10px;
+  border-top: 2px solid var(--accent);
+  margin-top: 18px;
+  flex-shrink: 0;
+}
+footer a { color: var(--accent); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .contenedor {
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    gap: 16px;
+    width: calc(100% - 32px);
+  }
+  .calendario, .formulario {
+    width: 100%;
+    max-width: 420px;
+  }
+  .calendario { order: 1; margin-bottom: 6px; }
+  .formulario { order: 2; }
+  .formulario .imagen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .formulario .imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.3);
+  }
+  .formulario input, .formulario select, .formulario button {
+    font-size: 1rem;
+    padding: 12px;
+  }
+}
+
+/* Extras */
+.calendario header { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; }
+.calendario header button {
+  background-color:#444; color:#eee; border:1px solid #000; border-radius:6px; padding:6px 12px; cursor:pointer;
+}
+.calendario header button:hover { background-color:#666; }
+
+
+

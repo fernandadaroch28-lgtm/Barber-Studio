@@ -1,0 +1,224 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>RerservaCalendario</title>
+<link href="calendario.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+	 <header class="barra-superior">
+			<div class="logo">
+		<img src="../../Imágenes/LogoBarberStudioMascorto.jpg" alt="logo">
+			</div>
+
+		</header>
+	 <div class="contenedor">
+		
+  <!-- Calendario -->
+  <div class="calendario">
+    <header>
+      <button id="btn-anterior">◀</button>
+      <h2 id="mes-anio"></h2>
+      <button id="btn-siguiente">▶</button>
+    </header>
+    <table id="tabla-calendario">
+      <thead>
+        <tr>
+          <th>Do</th><th>Lu</th><th>Ma</th><th>Mi</th><th>Ju</th><th>Vi</th><th>Sa</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div class="horas" id="lista-horas"></div>
+  </div>
+
+  <!-- Formulario -->
+  <div class="formulario">
+	  <div class="imagen">
+      <img src="../../Desktop/PaginaWebBarberStudio/Gmail (1)/barberoooo.jpg" alt="Barbería" />
+    </div>
+    <h2>Reserva tu hora</h2>
+    <form id="formulario-reserva" action="https://formspree.io/f/xdkdpdzd" method="POST">
+      <input type="text" name="nombre" placeholder="Tu nombre" required />
+      <input type="tel" name="telefono" placeholder="Teléfono de contacto" required />
+      <input type="text" name="dia" id="diaSeleccionado" placeholder="Día" readonly required />
+      <input type="text" name="hora" id="horaSeleccionada" placeholder="Hora" readonly required />
+      <input type="text" name="servicio" id="servicio" readonly required />
+      <button type="submit">Reservar</button>
+    </form>
+  </div>
+</div>
+	
+	<footer>
+	<p> © 2025. Todos los derechos reservados </p>
+	</footer>
+ 
+<script>
+  let fechaActual = new Date();
+  let fechaSeleccionada = null;
+  let horaSeleccionada = null;
+
+  const horasDisponibles = [ "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"];
+
+  const tablaBody = document.querySelector("#tabla-calendario tbody");
+  const mesAnio = document.getElementById("mes-anio");
+  const listaHoras = document.getElementById("lista-horas");
+  const inputDia = document.getElementById("diaSeleccionado");
+  const inputHora = document.getElementById("horaSeleccionada");
+  const btnAnterior = document.getElementById("btn-anterior");
+  const btnSiguiente = document.getElementById("btn-siguiente");
+
+  function generarCalendario() {
+    const mes = fechaActual.getMonth();
+    const anio = fechaActual.getFullYear();
+    mesAnio.textContent = fechaActual.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
+
+    const primerDiaMes = new Date(anio, mes, 1).getDay();
+    const diasEnMes = new Date(anio, mes + 1, 0).getDate();
+
+    tablaBody.innerHTML = "";
+    let fila = document.createElement("tr");
+
+    // Ajustar para que la semana empiece el lunes (opcional)
+    // Si quieres domingo como primer día, no cambies
+    // Aquí domingo=0, lunes=1, ..., sábado=6
+    // Para que la tabla empiece en domingo, hacemos así:
+    let offset = primerDiaMes; // domingo=0
+
+    for (let i = 0; i < offset; i++) {
+      fila.appendChild(document.createElement("td"));
+    }
+
+    for (let dia = 1; dia <= diasEnMes; dia++) {
+      const celda = document.createElement("td");
+      celda.textContent = dia;
+
+      celda.onclick = () => seleccionarDia(dia, mes, anio);
+
+      if (fechaSeleccionada &&
+          fechaSeleccionada.getDate() === dia &&
+          fechaSeleccionada.getMonth() === mes &&
+          fechaSeleccionada.getFullYear() === anio) {
+        celda.classList.add("seleccionado");
+      }
+
+      fila.appendChild(celda);
+
+      if ((fila.children.length) % 7 === 0) {
+        tablaBody.appendChild(fila);
+        fila = document.createElement("tr");
+      }
+    }
+
+    if (fila.children.length > 0) {
+      tablaBody.appendChild(fila);
+    }
+  }
+
+  function cambiarMes(delta) {
+    fechaActual.setMonth(fechaActual.getMonth() + delta);
+    generarCalendario();
+    limpiarSeleccion();
+  }
+
+  function seleccionarDia(dia, mes, anio) {
+    fechaSeleccionada = new Date(anio, mes, dia);
+    inputDia.value = fechaSeleccionada.toISOString().slice(0, 10);
+    horaSeleccionada = null;
+    inputHora.value = "";
+    generarCalendario();
+    mostrarHoras();
+  }
+
+  function mostrarHoras() {
+  listaHoras.innerHTML = "";
+  if (!fechaSeleccionada) return;
+
+  if (fechaSeleccionada.getDay() === 0) { // domingo no hay atención
+    listaHoras.textContent = "No hay atención los domingos";
+    return;
+  }
+
+
+// Objeto con reservas manuales ejemplo:
+// Llave: fecha en formato "YYYY-MM-DD"
+// Valor: array de horas reservadas en ese día
+const reservasManual = {
+  "2025-08-10": ["11:00", "15:00"],
+  "2025-08-21": ["13:00"]
+  // Agrega más fechas y horas aquí según lo que tengas que bloquear
+};
+  const fechaStr = fechaSeleccionada.toISOString().slice(0,10);
+  const horasReservadas = reservasManual[fechaStr] || [];
+
+  horasDisponibles.forEach(hora => {
+    const divHora = document.createElement("div");
+    divHora.textContent = hora;
+    divHora.classList.add("hora");
+
+    if (horaSeleccionada === hora) {
+      divHora.classList.add("seleccionada");
+    }
+
+    if (horasReservadas.includes(hora)) {
+      divHora.classList.add("reservada"); // Aplica estilo para bloqueado (rojo)
+      divHora.onclick = null; // No se puede seleccionar
+    } else {
+      divHora.onclick = () => {
+        horaSeleccionada = hora;
+        inputHora.value = hora;
+        mostrarHoras();
+      };
+    }
+
+    listaHoras.appendChild(divHora);
+  });
+}
+
+  function limpiarSeleccion() {
+    fechaSeleccionada = null;
+    horaSeleccionada = null;
+    inputDia.value = "";
+    inputHora.value = "";
+    listaHoras.innerHTML = "";
+    generarCalendario();
+  }
+
+  btnAnterior.onclick = () => cambiarMes(-1);
+  btnSiguiente.onclick = () => cambiarMes(1);
+
+  window.addEventListener("DOMContentLoaded", () => {
+    generarCalendario();
+  });
+</script>
+
+	<script>
+  // Función para leer parámetros GET de la URL
+  function obtenerParametroURL(nombre) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(nombre);
+  }
+
+  // Al cargar la página, asignamos el servicio al input y lo hacemos readonly
+  window.addEventListener('DOMContentLoaded', () => {
+    const servicio = obtenerParametroURL('servicio');
+    if (servicio) {
+      // Decodificamos por si hay espacios u otros caracteres
+      const servicioDecodificado = decodeURIComponent(servicio);
+      const inputServicio = document.getElementById('servicio');
+      if (inputServicio) {
+        inputServicio.value = servicioDecodificado;
+        inputServicio.readOnly = true; // para asegurarnos que no se pueda cambiar
+      }
+    }
+  });
+</script>
+
+
+</body>
+</html>
+
+
+
+
